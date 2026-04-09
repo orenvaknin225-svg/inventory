@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>רשימת חלקים</title>
+  <style>
+    body { font-family: Arial; max-width: 1100px; margin: 30px auto; padding: 15px; background:#f5f5f5; }
+    .box { background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    table { width:100%; border-collapse:collapse; background:white; }
+    th, td { border:1px solid #ddd; padding:10px; text-align:center; font-size:14px; }
+    input, button { padding:10px; margin:5px; }
+    button, .btn { background:#222; color:white; border:none; border-radius:8px; text-decoration:none; display:inline-block; cursor:pointer; }
+    .logout { background:#555; color:white; padding:10px 14px; border-radius:8px; text-decoration:none; }
+    .msg { background:#d4edda; padding:10px; border-radius:8px; margin-bottom:15px; }
+    .low { color:#c0392b; font-weight:bold; }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>רשימת חלקים</h1>
+    <a class="logout" href="/logout">התנתק</a>
+    {% if is_admin %}
+      <a class="btn" href="/parts/new">הוסף חלק חדש</a>
+    {% endif %}
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="box">
+    <form method="GET" action="/parts">
+      <input name="q" placeholder="חיפוש לפי שם או מק״ט" value="{{ q }}">
+      <button type="submit">חפש</button>
+    </form>
+  </div>
+
+  <div class="box">
+    <table>
+      <tr>
+        <th>שם חלק</th>
+        <th>מק״ט</th>
+        <th>מלאי</th>
+        <th>פרטים</th>
+      </tr>
+      {% for part in parts %}
+      <tr>
+        <td>{{ part.name }}</td>
+        <td>{{ part.sku }}</td>
+        <td class="{{ 'low' if part.stock <= 3 else '' }}">{{ part.stock }}</td>
+        <td><a class="btn" href="/parts/{{ part.id }}">פתח</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+</body>
+</html>
