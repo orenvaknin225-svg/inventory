@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>פרטי חלק</title>
+  <style>
+    body { font-family: Arial; max-width: 1100px; margin: 30px auto; padding: 15px; background:#f5f5f5; }
+    .box { background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    table { width:100%; border-collapse:collapse; background:white; }
+    th, td { border:1px solid #ddd; padding:10px; text-align:center; font-size:14px; }
+    input, button { padding:10px; margin:5px; }
+    button { background:#222; color:white; border:none; border-radius:8px; cursor:pointer; }
+    .msg { background:#d4edda; padding:10px; border-radius:8px; margin-bottom:15px; }
+    .danger { background:#c0392b; }
+    .back { display:inline-block; margin-bottom:15px; }
+  </style>
+</head>
+<body>
+  <a class="back" href="/parts">חזרה לרשימת חלקים</a>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="msg">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="box">
+    <h1>{{ part.name }}</h1>
+    <p><strong>מק״ט:</strong> {{ part.sku }}</p>
+    <p><strong>מחיר:</strong> {{ part.price }}</p>
+    <p><strong>ספק:</strong> {{ part.supplier }}</p>
+    <p><strong>כמות במלאי:</strong> {{ part.stock }}</p>
+  </div>
+
+  <div class="box">
+    <h2>פעולות מלאי</h2>
+
+    {% if is_admin %}
+    <form method="POST" action="/parts/{{ part.id }}/add-stock">
+      <input name="quantity" type="number" placeholder="כמות להוספה" required>
+      <input name="note" placeholder="הערה (לא חובה)">
+      <button type="submit">הוסף למלאי</button>
+    </form>
+    {% endif %}
+
+    <form method="POST" action="/parts/{{ part.id }}/use-stock">
+      <input name="quantity" type="number" placeholder="כמות לשימוש / גריעה" required>
+      <input name="note" placeholder="הערה (לא חובה)">
+      <button class="danger" type="submit">גרע מהמלאי</button>
+    </form>
+  </div>
+
+  <div class="box">
+    <h2>היסטוריית תנועות</h2>
+    <table>
+      <tr>
+        <th>סוג פעולה</th>
+        <th>כמות</th>
+        <th>הערה</th>
+        <th>תאריך ושעה</th>
+      </tr>
+      {% for m in movements %}
+      <tr>
+        <td>{{ "הוספה" if m.movement_type == "add" else "שימוש" }}</td>
+        <td>{{ m.quantity }}</td>
+        <td>{{ m.note or "" }}</td>
+        <td>{{ m.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+</html>
